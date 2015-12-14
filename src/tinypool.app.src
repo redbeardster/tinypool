@@ -1,0 +1,12 @@
+{application, tinypool,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { tinypool_app, []}},
+  {env, []}
+ ]}.
