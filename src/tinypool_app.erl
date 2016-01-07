@@ -10,6 +10,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+    sync:go(),
     tinypool_sup:start_link().
 
 stop(_State) ->
