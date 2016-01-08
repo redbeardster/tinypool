@@ -1,4 +1,6 @@
-
+-module(tinypool).
+-behaviour(gen_server).
+-define(SERVER, ?MODULE).
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
@@ -15,19 +17,15 @@ check_wrktable() ->
 prepopulate (_TableName, 0) ->
     ok;
 prepopulate (TableName, WorkersNum) ->
-
     {ok, Pid} = supervisor:start_child(popd_listener_sup, [""]),
-
     unlink(Pid),
-
     ets:insert(TableName, {Pid, Pid}),    _Ref = erlang:monitor(process, Pid),
 %    io:format("Pid refs are: ~p~n", [S#state.refpids]),   
     prepopulate(TableName, WorkersNum -1).   
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
-
- run(Args) ->
+run(Args) ->
      gen_server:call(?SERVER, {run, Args}).
 
 async(Args) -> 
@@ -42,11 +40,15 @@ init(_Args) ->
 
 handle_call({async, Args}, From, State) ->
     
-% we need onpy one Pid
+% we need only one Pid
     [{Pid, _}] = lists:nth(1, ets:match(pidtab, '$1')),  
     io:format("Chosen pid: ~p~n", [Pid]),
+
 % we'll borrow it from Pid's list
-    ets:delete(pidtab, [{Pid,Pid}]),
+    ets:delete(pidtab, Pid),
+    
+    io:format("Left PIDS: ~p~n", [ets:match(pidtab, '$1')]),
+
 % tell it what to do
     gen_server:cast(Pid, {async, {State#state.conn, From, Args}}),
 % no, we don't reply to the calling process anything, the worker will do it

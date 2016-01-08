@@ -29,6 +29,8 @@ handle_cast({async, Args}, State) ->
     io:format("Pid: ~p~n", [self()]),
     {Conn, From, Req} = Args,
     SelectRes = epgsql:squery(Conn, Req),
+
+    timer:sleep(3000),
     gen_server:reply(From, SelectRes),
 
     tinypool ! {done, self()},
