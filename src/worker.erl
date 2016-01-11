@@ -12,32 +12,22 @@ start_link(Args) ->
 
 init(Args) ->
 
-     erlang:process_flag(trap_exit, true),
-    
-    io:format("Hello! I'm worker ~p~n",[self()]),
-    %% {Conn, From, Req} = Args,
-    %% SelectRes = epgsql:squery(Conn, Req),
-    %% gen_server:reply(From, SelectRes),   
-%    {ok, Conn}.
-{ok, Args}.
+     erlang:process_flag(trap_exit, true),   
+%   io:format("Hello! I'm worker ~p~n",[self()]),  
+    {ok, Args}.
 
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
 handle_cast({async, Args}, State) -> 
 
-    io:format("Pid: ~p~n", [self()]),
+ %  io:format("Pid: ~p~n", [self()]),
     {Conn, From, Req} = Args,
     SelectRes = epgsql:squery(Conn, Req),
-
-    timer:sleep(3000),
+    timer:sleep(1000),
     gen_server:reply(From, SelectRes),
-
     tinypool ! {done, self()},
-
-{noreply, State};
-
-
+    {noreply, State};
 
 handle_cast(_Msg, State) ->
      {noreply, State}.

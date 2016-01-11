@@ -11,7 +11,7 @@ init([]) ->
     RestartStrategy = {simple_one_for_one, 10, 60},
 
     Listener = {worker, {worker, start_link, []},
-            transient, 2000, worker, [worker]},
+            temporary, 2000, worker, [worker]},
 
     Children = [Listener],
 
