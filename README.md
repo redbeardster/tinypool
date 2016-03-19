@@ -1,1 +1,1 @@
-An experimental pooling facility with true synchronous time-consumptive calls support :)
+An experimental pooling facility with true asynchronous time-consumptive calls support :)
