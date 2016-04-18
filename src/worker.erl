@@ -11,8 +11,7 @@ start_link(Args) ->
      gen_server:start_link(?MODULE, [Args], []).
 
 init(Args) ->
-
-     erlang:process_flag(trap_exit, true),   
+     erlang:process_flag(trap_exit, true),
 %   io:format("Hello! I'm worker ~p~n",[self()]),  
     {ok, Args}.
 
@@ -21,18 +20,47 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({async, Args}, State) -> 
 
- %  io:format("Pid: ~p~n", [self()]),
-    {Conn, From, Req} = Args,
-    SelectRes = epgsql:squery(Conn, Req),
-    timer:sleep(1000),
-    gen_server:reply(From, SelectRes),
+   io:format("Worker Pid: ~p~n", [self()]),
+   io:format("Args is ~p~n", [Args]),
+   {{From, Req}, Arguments} = Args,
+   io:format("Client: ~p~n ", [From]),
+
+  %% Method = post,
+  %% URL = "http://localhost:2375/images/create?fromImage=" ++ Req,
+  %% Header = [],
+  %% Type = "",
+  %% Body = "",
+  %% HTTPOptions = [],
+  %% Options = [],
+  %% R = httpc:request(Method, {URL, Header, Type, Body}, HTTPOptions, Options),  
+
+    timer:sleep(6000),
+    From ! hello,
+ 
     tinypool ! {done, self()},
     {noreply, State};
 
 handle_cast(_Msg, State) ->
      {noreply, State}.
 
-handle_info(_Message, State) -> { noreply, State }.
+handle_info({async, Args}, State) -> 
+
+    {Conn, From, Req} = Args,
+    Method = post,
+    URL = "http://localhost:2375/images/create?fromImage=" ++ Req,
+    Header = [],
+    Type = "",
+    Body = "",
+    HTTPOptions = [],
+    Options = [],
+    R = httpc:request(Method, {URL, Header, Type, Body}, HTTPOptions, Options),   
+    gen_server:reply(From, R),
+    tinypool ! {done, self()},
+{noreply, State };
+
+handle_info(_Message, State) -> 
+{ noreply, State }.
+
 code_change(_OldVersion, State, _Extra) -> { ok, State }.
 terminate(_Reason, _State) ->
      ok.

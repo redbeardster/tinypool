@@ -7,14 +7,11 @@ start_link() ->
      supervisor:start_link({local,?MODULE}, ?MODULE, []).
 
 init([]) ->
-     RestartStrategy = {one_for_one, 10, 60},
-  
-    WorkerServer = {tinypool, {tinypool, start_link, []}, permanent, infinity,worker, [tinypool]}, 
-     
-     Children = [WorkerServer],
-     
-     {ok, {RestartStrategy, Children}}.    
 
+     RestartStrategy = {one_for_one, 10, 60},
+     WorkerServer = {tinypool, {tinypool, start_link, []}, permanent, infinity,worker, [tinypool]},
+     Children = [WorkerServer],
+     {ok, {RestartStrategy, Children}}.    
 
 shutdown() ->
      exit(whereis(?MODULE), shutdown).
