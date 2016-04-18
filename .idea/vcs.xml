@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/deps/epgsql" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/sync" vcs="Git" />
   </component>
 </project>
